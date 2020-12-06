@@ -3,3 +3,5 @@
 .idea/Thorn.iml
 node_modules
 .eslintcache
+*.iml
+*.pyc

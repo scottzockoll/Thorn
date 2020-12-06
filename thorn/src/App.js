@@ -30,12 +30,12 @@ const InputString = (props) => {
                 aria-describedby="basic-addon2"
                 onKeyPress={event => {
                     if (event.key === "Enter") {
-                        props.onClick();
+                        props.onClick(event.target.value);
                     }
                 }}
             />
             <InputGroup.Append>
-                <Button variant="outline-success" key={"evaluate"} onClick={props.onClick}>Evaluate</Button>
+                <Button variant="outline-success" type="submit" key={"evaluate"}>Evaluate</Button>
             </InputGroup.Append>
         </InputGroup>
     )
@@ -92,7 +92,7 @@ const Rules = (props) => {
     return (
         <Card>
             <Card.Body>
-                <InputString onClick={() => console.log('evaluate clicked')}/>
+                <InputString onClick={(value) => props.onEvaluate(value)}/>
                 <NewRuleButton onClick={incrementAmount}/>
             </Card.Body>
             <Card.Body>
@@ -105,11 +105,28 @@ const Rules = (props) => {
 }
 
 const Markov = () => {
+    const [output, setOutput] = useState('')
     let ruleBook = {}
 
-    const printRuleBook = () => {
-        console.log('Rule book:')
-        console.log(ruleBook)
+    async function handleEvaluate(value) {
+
+        const formData = new FormData()
+        let formattedRuleBook = {}
+        Object.keys(ruleBook).forEach((key) => {
+            formattedRuleBook[ruleBook[key][0]] = ruleBook[key][1]
+        })
+        Object.keys(formattedRuleBook).forEach((key) => {
+            formData.append(key, formattedRuleBook[key])
+        })
+
+        if (value) {
+            let obj = await fetch(`http://localhost:5000/evaluate/${value}`, {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(json => setOutput(json['result']))
+        }
     }
 
     const onDeleteRule = (index) => {
@@ -122,14 +139,13 @@ const Markov = () => {
 
     return (
         <Container>
-            <button onClick={printRuleBook}>Print ruleBook</button>
             <Row>
                 <Col>
-                    <Rules amount={3} onChange={handleChange} onDeleteRule={onDeleteRule}/>
+                    <Rules amount={3} onChange={handleChange} onDeleteRule={onDeleteRule} onEvaluate={handleEvaluate}/>
                 </Col>
                 <Col>
                     <Card>
-                        <Card.Body>This is some text within a card body.</Card.Body>
+                        <Card.Body>Output: {output}</Card.Body>
                     </Card>
                 </Col>
             </Row>
@@ -139,7 +155,7 @@ const Markov = () => {
 
 const App = () => (
     <Container className="p-3">
-        <Markov />
+        <Markov/>
     </Container>
 );
 
