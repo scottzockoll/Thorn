@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 
-import Toast from 'react-bootstrap/Toast';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 
@@ -10,6 +9,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import InputGroup from "react-bootstrap/InputGroup";
 import FormControl from "react-bootstrap/FormControl";
+import Form from "react-bootstrap/Form";
 
 const NewRuleButton = (props) => {
     return (
@@ -23,21 +23,30 @@ const NewRuleButton = (props) => {
 }
 
 const InputString = (props) => {
+    const [value, setValue] = useState('')
     return (
-        <InputGroup className="mb-3">
-            <FormControl
-                aria-label="Recipient's username"
-                aria-describedby="basic-addon2"
-                onKeyPress={event => {
-                    if (event.key === "Enter") {
-                        props.onClick(event.target.value);
-                    }
-                }}
-            />
-            <InputGroup.Append>
-                <Button variant="outline-success" type="submit" key={"evaluate"}>Evaluate</Button>
-            </InputGroup.Append>
-        </InputGroup>
+        <Form onSubmit={(event) => {
+            event.preventDefault()
+        }}>
+            <InputGroup className="mb-3">
+                <FormControl
+                    aria-label="Recipient's username"
+                    aria-describedby="basic-addon2"
+                    onKeyPress={event => {
+                        if (event.key === "Enter") {
+                            props.onClick(value);
+                        }
+                    }}
+                    onChange={event => {
+                        setValue(event.target.value)
+                    }}
+                />
+                <InputGroup.Append>
+                    <Button variant="outline-success" type="submit" key={"evaluate"} onClick={() => props.onClick(value)}>Evaluate</Button>
+                </InputGroup.Append>
+            </InputGroup>
+        </Form>
+
     )
 }
 
@@ -52,7 +61,7 @@ const Rule = (props) => {
     return (
         <InputGroup className="mb-3">
             <FormControl
-                placeholder={props.index}
+                placeholder="Rule"
                 aria-label="Recipient's username"
                 aria-describedby="basic-addon2"
                 onChange={event => {
@@ -120,7 +129,7 @@ const Markov = () => {
         })
 
         if (value) {
-            let obj = await fetch(`http://localhost:5000/evaluate/${value}`, {
+            await fetch(`http://localhost:5000/evaluate/${value}`, {
                 method: 'POST',
                 body: formData
             })

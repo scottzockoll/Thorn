@@ -12,7 +12,10 @@ def hello_world(input_string):
     for key, value in request.form.items():
         rules[key] = value
     m = Markov(rules)
-    print(rules)
+    try:
+        result = m.evaluate(input_string)
+    except RuntimeError:
+        result = 'INFINITE RUNTIME'
     return {
-        'result': m.evaluate(input_string)
+        'result': result
     }
