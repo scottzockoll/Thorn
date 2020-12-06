@@ -129,7 +129,7 @@ const Markov = () => {
         })
 
         if (value) {
-            await fetch(`http://localhost:5000/evaluate/${value}`, {
+            await fetch(`http://scottzockoll.com/markov/evaluate/${value}`, {
                 method: 'POST',
                 body: formData
             })
